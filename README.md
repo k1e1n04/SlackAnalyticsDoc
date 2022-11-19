@@ -1,0 +1,2 @@
+# SlackAnalyticsDoc
+SlackAnalyticsのドキュメント用のリポジトリです。
