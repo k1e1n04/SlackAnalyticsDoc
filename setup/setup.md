@@ -135,5 +135,5 @@ slackanalytics-front-1   "docker-entrypoint.s…"   front               running 
 ## 8. サーバーの確認
 以下の二つのリンクにアクセスしてください。  
 1. [http://localhost:8000/admin](http://localhost:8000/admin)
-2. [http://localhost:3000/](http://localhost:3000/)
+2. [http://localhost:3000/](http://localhost:3000/)  
 「このサイトにアクセスできません」という表示が出なければ環境構築は完了です。
