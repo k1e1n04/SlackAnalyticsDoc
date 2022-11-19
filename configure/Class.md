@@ -1,6 +1,11 @@
 # SlackAnalyticsクラス図
 ## 注意
-本クラス図はplantUMLを用いてVScodeにてプレビュー表示することを想定しております。  
+本クラス図はplantUMLを用いて作成しております。  
+### Choromeで閲覧する場合
+拡張機能をインストールしてください。  
+- [Pegmatite - Chrome ウェブストア](https://chrome.google.com/webstore/detail/pegmatite/jegkfbnfbfnohncpcfcimepibmhlkldo)
+
+### VScodeで閲覧する場合
 以下の拡張機能VScodeにインストールしてこちらのファイルを開いてください。
 
 - PlantUML
