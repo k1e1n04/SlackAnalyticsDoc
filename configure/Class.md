@@ -1,4 +1,4 @@
-# SlackAnalyticsクラス図
+# SlackAnalyticsAPIクラス図
 ## 注意
 本クラス図はplantUMLを用いてVScodeにてプレビュー表示することを想定しております。  
 以下の拡張機能VScodeにインストールしてこちらのファイルを開いてください。
