@@ -93,7 +93,27 @@ docker-compose build
 ```
 MacOSの場合はDocker Desktopのインストール時にDocker Composeもインストールされています。もしdocker-composeコマンドが利用できない場合は別途インストールしてください。
 
-## 5. 作成したイメージの起動
+## 5. mysqlディレクトリの作成
+SlackAnalyticsディレクトリ内に下記の構成でディレクトリを作成してください。
+```
+SlackAnalytics
+ |---mysql
+        |---data # MySQLのデータ永続化用
+        |---sql # MySQL 起動時の初期化スクリプト置き場
+```
+
+# 6. MySQLの設定ファイルの作成
+5で作成したmysqlディレクトリ内に「my.conf」というファイルを作成してください。中身は以下の通りです。
+``` my.conf
+[mysqld]
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+
+[client]
+default-character-set=utf8mb4   
+```
+
+## 7. 作成したイメージの起動
 SlackAnalyticsディレクトリ内で以下のコマンドを実行してください。
 ※ MySQLのポートは3306番を使用しています。ローカル環境でMySQLを起動している場合は停止してください。
 ```
@@ -112,7 +132,7 @@ slackanalytics-db-1      "docker-entrypoint.s…"   db                  running 
 slackanalytics-front-1   "docker-entrypoint.s…"   front               running             0.0.0.0:3000->3000/tcp
 ```
 
-## 6. サーバーの確認
+## 8. サーバーの確認
 以下の二つのリンクにアクセスしてください。  
 1. [http://localhost:8000/admin](http://localhost:8000/admin)
 2. [http://localhost:3000/](http://localhost:3000/)
