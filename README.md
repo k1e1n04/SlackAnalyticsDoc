@@ -9,3 +9,7 @@ Docker Composeを用いて環境構築を行います。
 ## データベース定義
 こちらのドキュメントに記載しています。  
 - [Class.md](./configure/Class.md)
+
+## 構成図
+こちらのドキュメントに記載しています。  
+- [Diagram.md](./configure/Diagram.md)
