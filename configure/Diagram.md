@@ -27,8 +27,8 @@ folder "Client" {
 
 cloud "Azure Container Apps"{
     node "nginx"
-    node "SlackAnalyticsBackEnd(API)"
-    node "SlackAnalyticsFrontEnd"
+    node "SlackAnalyticsBackEnd(DjangoRESTAPI)"
+    node "SlackAnalyticsFrontEnd(React)"
     node {
         database "MySQL"{
             [slackanalytics]
@@ -40,14 +40,14 @@ folder SlackAPI
 
 [PC]-->[nginx]:HTTP Req
 [PC]<--[nginx]:HTTP Res
-[nginx]-->[SlackAnalyticsFrontEnd]:Port Forward
-[nginx]<--[SlackAnalyticsFrontEnd]:Res
-[nginx]-->[SlackAnalyticsBackEnd(API)]:Port Forward
-[nginx]<--[SlackAnalyticsBackEnd(API)]:Res
-[SlackAnalyticsFrontEnd]-->[SlackAnalyticsBackEnd(API)]:HPPT Req
-[SlackAnalyticsFrontEnd]<--[SlackAnalyticsBackEnd(API)]:HPPT Res
-[SlackAnalyticsBackEnd(API)]-->[slackanalytics]:SQL(select)
-[SlackAnalyticsBackEnd(API)]<--[slackanalytics]:All Tables Data
+[nginx]-->[SlackAnalyticsFrontEnd(React)]:Port Forward
+[nginx]<--[SlackAnalyticsFrontEnd(React)]:Res
+[nginx]-->[SlackAnalyticsBackEnd(DjangoRESTAPI)]:Port Forward
+[nginx]<--[SlackAnalyticsBackEnd(DjangoRESTAPI)]:Res
+[SlackAnalyticsFrontEnd(React)]-->[SlackAnalyticsBackEnd(DjangoRESTAPI)]:HPPT Req
+[SlackAnalyticsFrontEnd(React)]<--[SlackAnalyticsBackEnd(DjangoRESTAPI)]:HPPT Res
+[SlackAnalyticsBackEnd(DjangoRESTAPI)]-->[slackanalytics]:SQL(select)
+[SlackAnalyticsBackEnd(DjangoRESTAPI)]<--[slackanalytics]:All Tables Data
 [PostAnalyticsServer]-->[slackanalytics]: SQL(Post Table Data(create))
 [PostAnalyticsServer]<--[slackanalytics]: Organization,Channel,Employee Table Data
 [PostAnalyticsServer]-->[SlackAPI]:HTTP Req
