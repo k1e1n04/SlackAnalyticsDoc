@@ -1,6 +1,6 @@
 # SlackAnalytics構成図
 ## 注意
-本クラス図はplantUMLを用いて作成しております。  
+本構成図はplantUMLを用いて作成しております。  
 ### Choromeで閲覧する場合
 拡張機能をインストールしてください。  
 - [Pegmatite - Chrome ウェブストア](https://chrome.google.com/webstore/detail/pegmatite/jegkfbnfbfnohncpcfcimepibmhlkldo)
