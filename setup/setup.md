@@ -138,3 +138,21 @@ slackanalytics-front-1   "docker-entrypoint.s…"   front               running 
 1. [http://localhost:8000/admin](http://localhost:8000/admin)
 2. [http://localhost:3000/](http://localhost:3000/)  
 「このサイトにアクセスできません」という表示が出なければ環境構築は完了です。
+
+## 9. (初回のみ)データベースに初期データを投入
+下記のコマンドを実行し、APIコンテナの中に入ってください。
+```
+docker exec -it slackanalytics-api-1 /bin/bash
+```
+その後下記のコマンドを実行しOrganizationとBaseの初期データを投入します。
+```
+python manage.py loaddata ./analytics/fixtures/seed_data.json
+```
+
+## 10. APIのスーパーユーザーを作成します。
+9でAPIコンテナの中に入った状態で下記のコマンドを入力し、スーパーユーザーを作成してください。(emailとpasswordはお好きな値を入力してください。)
+```
+python manage.py createsuperuser
+```
+上記完了後[http://localhost:8000/admin](http://localhost:8000/admin)にアクセスすることでアドミンページにログインできます。
+
