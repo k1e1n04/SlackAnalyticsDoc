@@ -57,7 +57,7 @@ services:
             python manage.py runserver 0.0.0.0:8000"
     environment:
       WAIT_HOSTS: db:3306
-      WAIT_TIMEOUT: 120 # dbの構築を120秒間待機する
+      WAIT_TIMEOUT: 120 # dbの構築待機のタイムアウト
   front:
     image: slackanalytics-front
     build:
