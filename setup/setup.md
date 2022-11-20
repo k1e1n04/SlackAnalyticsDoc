@@ -41,6 +41,7 @@ services:
   api:
     image: slackanalytics-api
     tty: true
+    restart: always
     build:
       context: .
       dockerfile: ./SlackAnalyticsBackEnd/Dockerfile
