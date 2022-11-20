@@ -1,9 +1,10 @@
 # SlackAnalytics環境構築手順
 SlackAnalyticsBackEnd(Django REST API)とSlackAnalyticsFrontEnd(React)の環境構築手順です。
 
-## 0. docker環境の構築
-本サービスはDockerを利用しています。  
-下記サイトよりDocker Desktopをインストールしてください。
+## 0. node・docker環境の構築
+本サービスはnode・Dockerを利用しています。  
+[node](https://nodejs.org/ja/download/releases/)のversion16をインストールしてください。
+また下記サイトよりDocker Desktopをインストールしてください。
 [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ## 1. リポジトリの複製
@@ -88,14 +89,21 @@ DB_NAME="" # docker-composeで設定したもの
 ```
 Djangoのシークレットキーの作成は[こちら](https://blog.kyanny.me/entry/2021/01/27/033507)を参考にしてください。
 
-## 4. Dockerイメージのビルド
+## 4. フロントエンドの依存関係のあるモジュールのインストール
+SlackAnalytics/SlackAnalyticsFrontEnd/node/slackanalytics_frontディレクトリに移動し、下記のコマンドを実行してください。
+```
+npm install
+```
+プロジェクトと依存関係のあるモジュールをインストールできます。
+
+## 5. Dockerイメージのビルド
 SlackAnalyticsディレクトリ内で以下のコマンドを実行してください。
 ```
 docker-compose build
 ```
 MacOSの場合はDocker Desktopのインストール時にDocker Composeもインストールされています。もしdocker-composeコマンドが利用できない場合は別途インストールしてください。
 
-## 5. mysqlディレクトリの作成
+## 6. mysqlディレクトリの作成
 SlackAnalyticsディレクトリ内に下記の構成でディレクトリを作成してください。
 ```
 SlackAnalytics
@@ -104,8 +112,8 @@ SlackAnalytics
         |---sql # MySQL 起動時の初期化スクリプト置き場
 ```
 
-# 6. MySQLの設定ファイルの作成
-5で作成したmysqlディレクトリ内に「my.conf」というファイルを作成してください。中身は以下の通りです。
+## 7. MySQLの設定ファイルの作成
+作成したmysqlディレクトリ内に「my.conf」というファイルを作成してください。中身は以下の通りです。
 ``` my.conf
 [mysqld]
 character-set-server=utf8mb4
@@ -115,7 +123,7 @@ collation-server=utf8mb4_unicode_ci
 default-character-set=utf8mb4   
 ```
 
-## 7. 作成したイメージの起動
+## 8. 作成したイメージの起動
 SlackAnalyticsディレクトリ内で以下のコマンドを実行してください。
 ※ MySQLのポートは3306番を使用しています。ローカル環境でMySQLを起動している場合は停止してください。
 ```
@@ -134,13 +142,13 @@ slackanalytics-db-1      "docker-entrypoint.s…"   db                  running 
 slackanalytics-front-1   "docker-entrypoint.s…"   front               running             0.0.0.0:3000->3000/tcp
 ```
 
-## 8. サーバーの確認
+## 9. サーバーの確認
 以下の二つのリンクにアクセスしてください。  
 1. [http://localhost:8000/admin](http://localhost:8000/admin)
 2. [http://localhost:3000/](http://localhost:3000/)  
 「このサイトにアクセスできません」という表示が出なければ環境構築は完了です。
 
-## 9. (初回のみ)データベースに初期データを投入
+## 10. (初回のみ)データベースに初期データを投入
 下記のコマンドを実行し、APIコンテナの中に入ってください。
 ```
 docker exec -it slackanalytics-api-1 /bin/bash
@@ -150,8 +158,8 @@ docker exec -it slackanalytics-api-1 /bin/bash
 python manage.py loaddata ./analytics/fixtures/seed_data.json
 ```
 
-## 10. APIのスーパーユーザーを作成します。
-9でAPIコンテナの中に入った状態で下記のコマンドを入力し、スーパーユーザーを作成してください。(emailとpasswordはお好きな値を入力してください。)
+## 11. APIのスーパーユーザーを作成します。
+APIコンテナの中に入った状態で下記のコマンドを入力し、スーパーユーザーを作成してください。(emailとpasswordはお好きな値を入力してください。)
 ```
 python manage.py createsuperuser
 ```
