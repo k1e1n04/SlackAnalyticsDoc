@@ -11,5 +11,5 @@ Docker Composeを用いて環境構築を行います。
 - [Class.md](./configure/Class.md)
 
 ## 構成図
-こちらのドキュメントに記載しています。  
-- [Diagram.md](./configure/Diagram.md)
+こちらに記載しています。  
+- [Diagram.svg](./configure/Diagram.svg)
