@@ -1,5 +1,6 @@
 # SlackAnalytics環境構築手順
-SlackAnalyticsBackEnd(Django REST API)とSlackAnalyticsFrontEnd(React)の環境構築手順です。
+SlackAnalyticsBackEnd(Django REST API)とSlackAnalyticsFrontEnd(React)の環境構築手順です。  
+本番環境ではNginxとgunicornを使用しますが、開発環境ではホットリロードができず効率が悪いためDjango+MySQL+Reactコンテナを用います。
 
 ## 0. node・docker環境の構築
 本サービスはnode・Dockerを利用しています。  
