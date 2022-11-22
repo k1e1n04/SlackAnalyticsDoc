@@ -30,10 +30,10 @@ services:
       mysqld --innodb_use_native_aio=0 &&
       mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment: 
-      MYSQL_ROOT_PASSWORD: gh63tdd31
+      MYSQL_ROOT_PASSWORD: 
       MYSQL_DATABASE: slackanalytics
       MYSQL_USER: user
-      MYSQL_PASSWORD: gh63tdd31
+      MYSQL_PASSWORD: 
       MYSQL_ROOT_HOST: '%'
       TZ: 'Asia/Tokyo'
     volumes: 
