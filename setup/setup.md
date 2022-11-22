@@ -23,16 +23,17 @@ version: "3"
 services:
   db:
     image: mysql:5.7
+    container_name: mysql
     platform: linux/amd64
     restart: always
     command: >
       mysqld --innodb_use_native_aio=0 &&
       mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment: 
-      MYSQL_ROOT_PASSWORD: {MYSQL_ROOT_PASSWORD}自分で設定
-      MYSQL_DATABASE: {MYSQL_DATABASE}自分で設定
-      MYSQL_USER: {MYSQL_USER}自分で設定
-      MYSQL_PASSWORD: {MYSQL_PASSWORD}自分で設定
+      MYSQL_ROOT_PASSWORD: gh63tdd31
+      MYSQL_DATABASE: slackanalytics
+      MYSQL_USER: user
+      MYSQL_PASSWORD: gh63tdd31
       MYSQL_ROOT_HOST: '%'
       TZ: 'Asia/Tokyo'
     volumes: 
@@ -43,6 +44,7 @@ services:
       - 3306:3306
   api:
     image: slackanalytics-api
+    container_name: slackanalytics-api
     tty: true
     restart: always
     build:
@@ -60,9 +62,10 @@ services:
             python manage.py runserver 0.0.0.0:8000"
     environment:
       WAIT_HOSTS: db:3306
-      WAIT_TIMEOUT: 120 # dbの構築待機のタイムアウト
+      WAIT_TIMEOUT: 120 # dbの構築を120秒間待機する
   front:
     image: slackanalytics-front
+    container_name: slackanalytics-front
     build:
       context: .
       dockerfile: ./SlackAnalyticsFrontEnd/Dockerfile
