@@ -178,7 +178,7 @@ SlackAnalytics
 ```
 その後phpmyadminディレクトリ内に"sessions"という名前でファイルを作成してください。
 
-## 8. 作成したイメージの起動
+## 9. 作成したイメージの起動
 SlackAnalyticsディレクトリ内で以下のコマンドを実行してください。
 ※ MySQLのポートは3306番を使用しています。ローカル環境でMySQLを起動している場合は停止してください。
 ```
@@ -200,7 +200,7 @@ slackanalytics-front          "docker-entrypoint.s…"   front               run
 slackanalytics-phpmyadmin-1   "/docker-entrypoint.…"   phpmyadmin          running             0.0.0.0:81->80/tcp
 ```
 
-## 9. サーバーの確認
+## 10. サーバーの確認
 以下の二つのリンクにアクセスしてください。  
 1. [API](http://localhost:8080/)
 2. [FrontEnd](http://localhost:4200/)  
