@@ -81,7 +81,6 @@ Department "1..*"--"*" Employee
 Channel "1..*"--"*" Post
 Employee "1..*"--"*" Post
 Organization "1..*"--"*" User
-Base "1..*"--"*" User
 
 
 
