@@ -1,6 +1,5 @@
 # SlackAnalytics環境構築手順
-SlackAnalyticsBackEnd(Django REST API)とSlackAnalyticsFrontEnd(React)の環境構築手順です。  
-本番環境ではNginxとgunicornを使用しますが、開発環境ではホットリロードができず効率が悪いためDjango+MySQL+Reactコンテナを用います。
+SlackAnalyticsAPI(Express)とSlackAnalyticsFrontEnd(React)の環境構築手順です。  
 
 ## 0. node・docker環境の構築
 本サービスはnode・Dockerを利用しています。  
@@ -10,10 +9,12 @@ SlackAnalyticsBackEnd(Django REST API)とSlackAnalyticsFrontEnd(React)の環境�
 
 ## 1. リポジトリの複製
 SlackAnalyticsディレクトリを作成してください。  
-以下の二つのリポジトリを複製し、SlackAnalytics内に配置してください。
+以下のリポジトリを複製し、SlackAnalytics内に配置してください。
 
 1. [SlackAnalyticsFrontEnd](https://github.com/k1e1n04/SlackAnalyticsFrontEnd)
-2. [SlackAnalyticsBackEnd](https://github.com/k1e1n04/SlackAnalyticsBackEnd)
+2. [SlackAnalyticsAPI](https://github.com/k1e1n04/SlackAnalyticsAPI)
+3. [SlackAnalyticsAPI_Nginx](https://github.com/k1e1n04/SlackAnalyticsAPI_Nginx)
+4. [SlackAnalyticsFrontEnd_Nginx](https://github.com/k1e1n04/SlackAnalyticsFrontEnd_Nginx)
 
 ## 2. docker-composeファイルの作成
 SlackAnalyticsディレクトリ内にdocker-compose.ymlを作成し、以下を記載してください。
@@ -30,10 +31,10 @@ services:
       mysqld --innodb_use_native_aio=0 &&
       mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment: 
-      MYSQL_ROOT_PASSWORD: gh63tdd31
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: slackanalytics
       MYSQL_USER: user
-      MYSQL_PASSWORD: gh63tdd31
+      MYSQL_PASSWORD: password
       MYSQL_ROOT_HOST: '%'
       TZ: 'Asia/Tokyo'
     volumes: 
@@ -42,27 +43,40 @@ services:
       - ./mysql/sql:/docker-entrypoint-initdb.d
     ports: 
       - 3306:3306
+    networks:
+    - api_network
   api:
     image: slackanalytics-api
     container_name: slackanalytics-api
     tty: true
     restart: always
-    build:
-      context: .
-      dockerfile: ./SlackAnalyticsBackEnd/Dockerfile
-    depends_on:
-      - db
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./SlackAnalyticsBackEnd/django-api:/django-api
-    command: >
-            sh -c "/wait &&
-            python manage.py migrate --fake-initial &&
-            python manage.py runserver 0.0.0.0:8000"
-    environment:
+    environment: 
+      DB_NAME: slackanalytics
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
       WAIT_HOSTS: db:3306
       WAIT_TIMEOUT: 120 # dbの構築を120秒間待機する
+    build:
+      context: .
+      dockerfile: ./SlackAnalyticsAPI/express_api/Dockerfile
+    depends_on:
+      - db
+    volumes:
+      - ./SlackAnalyticsAPI/express_api:/usr/src/app
+      - ./SlackAnalyticsAPI/express_api/node_modules:/usr/src/app/node_modules
+    networks:
+      - api_network
+  api-server:
+    container_name: nginx_api
+    build:
+      context: ./SlackAnalyticsAPI_Nginx/.
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - api_network
   front:
     image: slackanalytics-front
     container_name: slackanalytics-front
@@ -75,23 +89,52 @@ services:
     command: sh -c "cd slackanalytics_front && yarn start"
     ports:
       - "3000:3000"
+    networks:
+      - front_network
+  frontend-server:
+    container_name: nginx_front
+    build:
+      context: ./SlackAnalyticsFrontEnd_Nginx/.
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4200:80"
+    depends_on:
+      - front
+    networks:
+      - front_network
+    environment:
+      WAIT_HOSTS: front:3000
+      WAIT_TIMEOUT: 120 # reactの構築を120秒間待機する
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=db
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    ports:
+      - "81:80"
+    volumes:
+      - ./phpmyadmin/sessions:/sessions
+    networks:
+      - api_network
+networks:
+  # nginx + apiのネットワーク
+  api_network:
+    driver: bridge
+  # nginx + reactのネットワーク
+  front_network:
+    driver: bridge
 volumes:
     mysql:
       driver: local
 ```
 
-## 3. BackEndの.env作成
-API側の環境変数を設定します。
-1. SlackAnalyticsBackEnd/django-api/.env.sampleのコピーを作成し".env"としてください。
-2. 以下の項目を変更します。
-```
-SECRET_KEY="" # DjangoのSECRET_KEY
-MYSQL_USER="" # docker-composeで設定したもの
-MYSQL_PASSWORD=""　# docker-composeで設定したもの
-MYSQL_ROOT_PASSWORD="" # docker-composeで設定したもの
-DB_NAME="" # docker-composeで設定したもの
-```
-Djangoのシークレットキーの作成は[こちら](https://blog.kyanny.me/entry/2021/01/27/033507)を参考にしてください。
+## 3. FrontEndの.env作成
+Front側の環境変数を設定します。
+SlackAnalyticsFrontEnd/node/slackanalytics_front/.env.sampleのコピーを作成し".env"としてください。
 
 ## 4. フロントエンドの依存関係のあるモジュールのインストール
 SlackAnalytics/SlackAnalyticsFrontEnd/node/slackanalytics_frontディレクトリに移動し、下記のコマンドを実行してください。
@@ -127,6 +170,14 @@ collation-server=utf8mb4_unicode_ci
 default-character-set=utf8mb4   
 ```
 
+## 8. phpmyadminディレクトリの作成
+SlackAnalyticsディレクトリ内に下記の構成でディレクトリを作成してください。
+```
+SlackAnalytics
+ |---phpmyadmin
+```
+その後phpmyadminディレクトリ内に"sessions"という名前でファイルを作成してください。
+
 ## 8. 作成したイメージの起動
 SlackAnalyticsディレクトリ内で以下のコマンドを実行してください。
 ※ MySQLのポートは3306番を使用しています。ローカル環境でMySQLを起動している場合は停止してください。
@@ -139,33 +190,22 @@ docker-compose up -d
 docker-compose ps
 ```
 ```
-docker-compose ps   
-NAME                     COMMAND                  SERVICE             STATUS              PORTS
-slackanalytics-api-1     "sh -c '/wait && pyt…"   api                 running             0.0.0.0:8000->8000/tcp
-slackanalytics-db-1      "docker-entrypoint.s…"   db                  running             0.0.0.0:3306->3306/tcp, 33060/tcp
-slackanalytics-front-1   "docker-entrypoint.s…"   front               running             0.0.0.0:3000->3000/tcp
+docker-compose ps                    
+NAME                          COMMAND                  SERVICE             STATUS              PORTS
+mysql                         "docker-entrypoint.s…"   db                  running             0.0.0.0:3306->3306/tcp, 33060/tcp
+nginx_api                     "nginx -g 'daemon of…"   api-server          running             0.0.0.0:8080->80/tcp
+nginx_front                   "nginx -g 'daemon of…"   frontend-server     running             0.0.0.0:4200->80/tcp
+slackanalytics-api            "docker-entrypoint.s…"   api                 running             8000/tcp
+slackanalytics-front          "docker-entrypoint.s…"   front               running             0.0.0.0:3000->3000/tcp
+slackanalytics-phpmyadmin-1   "/docker-entrypoint.…"   phpmyadmin          running             0.0.0.0:81->80/tcp
 ```
 
 ## 9. サーバーの確認
 以下の二つのリンクにアクセスしてください。  
-1. [http://localhost:8000/admin](http://localhost:8000/admin)
-2. [http://localhost:3000/](http://localhost:3000/)  
+1. [API](http://localhost:8080/)
+2. [FrontEnd](http://localhost:4200/)  
+おまけ
+3. [phpmyadmin](http://localhost:4200/) 
 「このサイトにアクセスできません」という表示が出なければ環境構築は完了です。
 
-## 10. (初回のみ)データベースに初期データを投入
-下記のコマンドを実行し、APIコンテナの中に入ってください。
-```
-docker exec -it slackanalytics-api-1 /bin/bash
-```
-その後下記のコマンドを実行しOrganizationとBaseの初期データを投入します。
-```
-python manage.py loaddata ./analytics/fixtures/seed_data.json
-```
-
-## 11. APIのスーパーユーザーを作成します。
-APIコンテナの中に入った状態で下記のコマンドを入力し、スーパーユーザーを作成してください。(emailとpasswordはお好きな値を入力してください。)
-```
-python manage.py createsuperuser
-```
-上記完了後[http://localhost:8000/admin](http://localhost:8000/admin)にアクセスすることでアドミンページにログインできます。
 
