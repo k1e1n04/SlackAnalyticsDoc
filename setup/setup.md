@@ -204,8 +204,7 @@ slackanalytics-phpmyadmin-1   "/docker-entrypoint.…"   phpmyadmin          run
 以下の二つのリンクにアクセスしてください。  
 1. [API](http://localhost:8080/)
 2. [FrontEnd](http://localhost:4200/)  
-おまけ
-3. [phpmyadmin](http://localhost:4200/) 
+3. [phpmyadmin](http://localhost:81/) 
 「このサイトにアクセスできません」という表示が出なければ環境構築は完了です。
 
 
